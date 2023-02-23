@@ -41,7 +41,7 @@ def calc_fitness(parent, func):
         a = 10
         n = len(parent)
         fitness = a * n
-        for i in range(len(parent)):
+        for i in range(n):
             x = parent[i]
             fitness += x * x - a * np.cos(2 * np.pi * x) # wikipedia says minus!!
         return fitness
