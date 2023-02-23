@@ -43,28 +43,36 @@ def crossover(Parents, crossover_function, rho):
     # ToDO: give sigma as well to the new children
     if crossover_function == 0:
         newparents: [Organism] = []
-        sum = 0
+        child: [Organism] = []
+        sum_x = 0
+        sum_sigma = 0
         for i in range(rho):
           newparent:  Organism = random.choice(Parents)
           newparents.append(newparent)
-          sum += newparents[i].x
-        child = sum / rho
+          sum_x += newparents[i].x
+          sum_sigma += newparents[i].sigma
+        child_x = sum_x / rho
+        child_sigma = sum_sigma / rho
+        child = Organism(fit=fitness(child_x, fitness_function), x=child_x, born=generation, sigma=child_sigma)
     else:
       print(f'Missing crossover function')
     return child
 
 def mutation(child, mutation_function, tau, sigma):
   # mutation_function = 0 # ["1-dimensional", "z dimensional"]
+
   if mutation_function == 0:
-    child = child + np.random.normal(0, sigma, len(child))
+    child_x = child.x + np.random.normal(0, sigma, len(child.x))
+    child =  Organism(fit=fitness(child_x, fitness_function), x=child_x, born=generation, sigma=sigma)
   elif mutation_function == 1:
     e_k = tau * np.random.randn(N) # eq. 5
     z_k = np.random.randn(N) # eq. 6
     sigma_k = child.sigma * np.exp(e_k) # eq. 7 # parent.sigma
-    child = child + sigma_k * z_k # eq. 8
-    sigma = sigma_k
+    child_x = child.x + sigma_k * z_k # eq. 8
+    #sigma = sigma_k
+    child = Organism(fit=fitness(child_x, fitness_function), x=child_x, born=generation, sigma=sigma_k)
   #child = child + sigma * np.random.randn(N)
-  return child, sigma #returns a tuple with the array and the sigma
+  return child #, sigma #returns a tuple with the array and the sigma
 
 def create_parents(mu, N, fitness_function, tau, sigma):
     print(f'Creating initial parent generation.')
@@ -83,15 +91,11 @@ def create_children(lambd, parents, mutation_function, crossover_function, rho, 
     children: [Organism] = []
     if mutation_function == 0:
         for i in range(lambd):
-            childX = mutation(crossover(parents, crossover_function, rho), mutation_function, tau, sigma)
-            child = Organism(fit=fitness(childX[0], fitness_function), x=childX[0], born=generation, sigma=sigma)
+            child = mutation(crossover(parents, crossover_function, rho), mutation_function, tau, sigma)
             children.append(child)
     elif mutation_function == 1:
         for i in range(lambd):
-            childX_sigma = mutation(crossover(parents, crossover_function, rho), mutation_function, tau, sigma)
-            childX = childX_sigma[0]
-            child_sigma = childX_sigma[1]
-            child = Organism(fit=fitness(childX, fitness_function), x=childX, born=generation, sigma=child_sigma)
+            child = mutation(crossover(parents, crossover_function, rho), mutation_function, tau, sigma)
             children.append(child)
     return children
 
