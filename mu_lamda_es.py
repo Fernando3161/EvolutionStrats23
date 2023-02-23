@@ -40,7 +40,7 @@ def fitness(parent, fitness_function=0):
 class organism:
     fit: float
     born: int
-    val: []
+    val: None
 
     def __init__(self, genomes=1, max_value=10):
         self.max_value = max_value
