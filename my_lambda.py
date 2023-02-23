@@ -98,7 +98,7 @@ if __name__ == '__main__':
     selection = ["plus", "comma"]
     max_generation = 100
 
-    parents: [Organism] = []
+    parents=[] #Organism
     for i in range(mu):
         parentX = np.random.randn(N)
         parent = Organism(val=parentX, fit=fitness(parentX, fitness_function))
