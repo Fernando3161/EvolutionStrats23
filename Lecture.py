@@ -105,3 +105,29 @@
     # "the smaller the s_o the smaller the stepsize"
 
     # draw these numbers and prove that this is true (eq. 11-15?) page 60 prove given statements
+
+
+# Chapter 9: Covariance Matrix Estimation
+
+# Chapter: Constraints
+    # Name constraint examples:
+        # Nowadays Travelling Salesman Problem with limited ship fuel
+        # In job shop scheduling, jobs must be done in a certain order on a certain ressource
+        # Jobshop: our evolution would maybe produce a schedule that just assigns every job to t = 0.
+        # Then obivously, make span would be very short. But that is not feasable in reality.
+    # Death penalty:
+        # Check solution for feasibility (constraints) --> generate solutions - discard solution if infeasible
+    # Penalty functions: deteriorate fitness, if solution is in constrained area
+        # Constraints sphere function
+        # Penalty adaption: may become death penalty in the later generations
+            # deterministic = according to a fixed scheme
+            # adaptively = depending on number of infeasible solutions
+    # Repair function
+        # measure g and minimize the penalty
+
+    # Decoder ???
+
+    # Premature stagnation
+
+
+    

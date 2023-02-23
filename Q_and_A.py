@@ -44,13 +44,28 @@ Sorting the best: N * mu
 When mu is smaller then log n (parents smaller log(children))
 Chapter 6:
 
-Thursday
-
-Friday
-
 Chapter 7: Self-Adaptation
 Q: Difference between Rechenberg and SA.
 A: Rechenberg variates the sigma by the number of successes. SA variates the sigma by the fitness of the solution.
+
+Thursday
+Chapter 9: Covariance Matrix Estimatio
+
+Chapter: Constraints
+
+Q: How many loops of Algorithms are typically used?
+A1: Literature gives typical choices for similar problems. Adaption afterwards - Parametrisation.
+    -->Leads to own neural network (brain) = Experience
+A2: Automize the parametrisation with an AI.
+A3: 80 % of problems can be solved with "standard" Parametrisation.
+
+Repair function
+Q: Hopw to find the constraint boundary line
+A: Split the line by half. Check middle. Repeat
+A: OR: Measure penalty miniimize penalty
+
+Friday
+
 
 
 

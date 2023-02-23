@@ -13,6 +13,11 @@
 # Selection
     # + = plus selection
     # , = comma selection
+# SA of sigma_k and z_k
+
+# Parametrisation
+    # mu, lambda,
+
 # Termination
 
 

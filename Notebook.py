@@ -40,6 +40,7 @@ def fitness(x, fitness_function):
   return fitness
 
 def crossover(Parents, crossover_function, rho):
+    # ToDO: give sigma as well to the new children
     if crossover_function == 0:
         newparents: [Organism] = []
         sum = 0
