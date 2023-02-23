@@ -2,8 +2,8 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-def init(N, sigma):
-  x =  np.random.rand(N) # * sigma
+def init(N, scaling_factor):
+  x =  np.random.rand(N) * scaling_factor
   return x
 
 class Organism:
@@ -70,12 +70,12 @@ def mutation(child, mutation_function, tau, sigma):
     child = Organism(fit=fitness(child_x, fitness_function), x=child_x, born=generation, sigma=sigma_k)
   return child
 
-def create_parents(mu, N, fitness_function, tau, sigma):
+def create_parents(mu, N, fitness_function, tau, sigma, scaling_factor):
     print(f'Creating initial parent generation.')
     parents: [Organism] = []
 
     for k in range(mu):
-      parentX = init(N, sigma)
+      parentX = init(N, scaling_factor)
       parent = Organism(fit=fitness(parentX, fitness_function), x = parentX, sigma=sigma)
       parents.append(parent)
 
@@ -111,12 +111,13 @@ if __name__ == '__main__':
     sigma = 1 / N  # mutation rates (also called stepsize)
     tau = 1 / np.sqrt(N)
     rho = 2
+    scaling_factor = 10 # scaling factor for the initial parents
     fitness_function = 2  # ["sphere", "rastrigen", "rosenbruck"]
     crossover_function = 0  # ["intermediate_recombination","multi_recombination"]
     selection_function = 0  # ["plus", "comma"]
     mutation_function = 1 # ["1-dimensional", "z dimensional"]
 
-    parents = create_parents(mu, N, fitness_function, tau, sigma)
+    parents = create_parents(mu, N, fitness_function, tau, sigma, scaling_factor)
     best_parent = sorted(parents, key=lambda x: x.fit)[0]
     print(f'Best parent fitness: {best_parent.fit}')
 
