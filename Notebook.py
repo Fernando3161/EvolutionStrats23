@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def init(N, sigma):
-  x =  np.random.rand(N) * sigma
+  x =  np.random.rand(N) # * sigma
   return x
 
 class Organism:
@@ -40,7 +40,6 @@ def fitness(x, fitness_function):
   return fitness
 
 def crossover(Parents, crossover_function, rho):
-    # ToDO: give sigma as well to the new children
     if crossover_function == 0:
         newparents: [Organism] = []
         child: [Organism] = []
@@ -60,7 +59,6 @@ def crossover(Parents, crossover_function, rho):
 
 def mutation(child, mutation_function, tau, sigma):
   # mutation_function = 0 # ["1-dimensional", "z dimensional"]
-
   if mutation_function == 0:
     child_x = child.x + np.random.normal(0, sigma, len(child.x))
     child =  Organism(fit=fitness(child_x, fitness_function), x=child_x, born=generation, sigma=sigma)
@@ -69,10 +67,8 @@ def mutation(child, mutation_function, tau, sigma):
     z_k = np.random.randn(N) # eq. 6
     sigma_k = child.sigma * np.exp(e_k) # eq. 7 # parent.sigma
     child_x = child.x + sigma_k * z_k # eq. 8
-    #sigma = sigma_k
     child = Organism(fit=fitness(child_x, fitness_function), x=child_x, born=generation, sigma=sigma_k)
-  #child = child + sigma * np.random.randn(N)
-  return child #, sigma #returns a tuple with the array and the sigma
+  return child
 
 def create_parents(mu, N, fitness_function, tau, sigma):
     print(f'Creating initial parent generation.')
@@ -115,7 +111,7 @@ if __name__ == '__main__':
     sigma = 1 / N  # mutation rates (also called stepsize)
     tau = 1 / np.sqrt(N)
     rho = 2
-    fitness_function = 0  # ["sphere", "rastrigen", "rosenbruck"]
+    fitness_function = 2  # ["sphere", "rastrigen", "rosenbruck"]
     crossover_function = 0  # ["intermediate_recombination","multi_recombination"]
     selection_function = 0  # ["plus", "comma"]
     mutation_function = 1 # ["1-dimensional", "z dimensional"]
@@ -126,6 +122,7 @@ if __name__ == '__main__':
 
     generation = 0
     solution_list = []
+    sigma_list = []
     #while best_parent.fit < 0.5:
     while generation < 100:
         generation += 1
@@ -135,11 +132,35 @@ if __name__ == '__main__':
         #print(f'Generation: {generation} Best fitness: {best_parent.fit}')
 
         solution_list.append(best_parent.fit)
+        if mutation_function == 0:
+            sigma_list.append(best_parent.sigma)
+        elif mutation_function == 1:
+            #ToDo: This does not work if the sigma is 1-dimensional (parents of 0 generation are bestparents)
+            try:
+                sigma_list.append(sum(best_parent.sigma))
+            except TypeError:
+                sigma_list.append(sigma)
+        else:
+            print(f'Sigma List Error')
+
     print(f'Generation: {generation} Best fitness: {best_parent.fit} from Generation: {best_parent.born}')
 
     # plot generation
-    plt.plot(solution_list, color="blue", )
-    plt.show()
+    x = []
+    for i in range(generation):
+        x.append(i)
 
+    fig, ax1 = plt.subplots()
+
+
+    ax2 = ax1.twinx()
+    ax1.plot(x, solution_list, 'blue')
+    ax2.plot(x, sigma_list, 'red')
+
+    ax1.set_xlabel('Iterations')
+    ax1.set_ylabel('Fitness', color='blue')
+    ax2.set_ylabel('Average sigma', color='red')
+
+    plt.show()
 
 
