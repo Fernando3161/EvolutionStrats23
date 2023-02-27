@@ -21,20 +21,23 @@ class Organism:
         self.sigma = sigma
 
 def fitness(x, fitness_function):
-  #["sphere", "rastrigen", "rosenbruck"]
+  #["sphere", "rastrigen", "rosenbruck", "doublesum"]
   if fitness_function == 0:
     fitness = np.dot(x, x)
   elif fitness_function == 1:
     a = 10
     fitness = a * len(x) + sum([(x**2 - a * np.cos(2 * np.pi * x)) for x in x])
   elif fitness_function == 2:
-    a = 1
-    b = 100
-    fitness = 0
-    for index, y in enumerate(x):
-      if index == N-1:
-        break
-      fitness += b * (x[index + 1] - y ** 2) ** 2 + (a - y) ** 2
+    # a = 1
+    # b = 100
+    # fitness = 0
+    # for index, y in enumerate(x):
+    #   if index == N-1:
+    #     break
+    #   fitness += b * (x[index + 1] - y ** 2) ** 2 + (a - y) ** 2
+    fitness = sum([100 * (x[i] ** 2 - x[i + 1]) ** 2 + (x[i] - 1) ** 2 for i in range(len(x) - 1)])
+  elif fitness_function == 3:
+      fitness = sum([sum(x[:i]) ** 2 for i, _ in enumerate(x)])
   else:
     print('No fitness function given')
   return fitness
@@ -115,7 +118,7 @@ if __name__ == '__main__':
     fitness_function = 2  # ["sphere", "rastrigen", "rosenbruck"]
     crossover_function = 0  # ["intermediate_recombination","multi_recombination"]
     selection_function = 0  # ["plus", "comma"]
-    mutation_function = 1 # ["1-dimensional", "z dimensional"]
+    mutation_function = 1 # ["1-dimensional", "z dimensional"] = SA
 
     parents = create_parents(mu, N, fitness_function, tau, sigma, scaling_factor)
     best_parent = sorted(parents, key=lambda x: x.fit)[0]
