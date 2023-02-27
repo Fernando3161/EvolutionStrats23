@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+import datetime
 
 from Organism import Organism
 import fitness as f
@@ -46,7 +48,7 @@ def crossover(Parents, crossover_function, rho):
 
 
 if __name__ == '__main__':
-    N = 100  # Genomes / dimensions
+    N = 10  # Genomes / dimensions
     mu = 20  # Parents
     lambd = 100  # Offsprings
     sigma = 1 / N  # mutation rates (also called stepsize)
@@ -99,9 +101,19 @@ if __name__ == '__main__':
                         mean_after = np.mean(solution_list[-20:-1])
                         if mean_after == mean_before:
                             print(f'No improvement exit.')
-                            generation = max_generation
+                            max_generation = generation
 
-                print(f'Generation: {generation} Best fitness: {best_parent.fit} from Generation: {best_parent.born}')
+                # print the current timestamp
+                # ct stores current time
+                ct = datetime.datetime.now()
+                #print("current time:-", ct)
+
+                # ts store timestamp of current time
+                #ts = ct.timestamp()
+                #print("timestamp:-", ts)
+
+                #ts = time.time()
+                print(f'Generation: {generation} Best fitness: {best_parent.fit} from Generation: {best_parent.born} Time: {ct}')
 
                 #plot generation
                 x = []
@@ -119,6 +131,7 @@ if __name__ == '__main__':
                 ax1.set_ylabel('Fitness', color='blue')
                 ax2.set_ylabel('Average sigma', color='red')
 
-                plt.show()
+                 # plt.show()
 
+                plt.savefig(f'{func.__name__}_{selec.__name__}_{muta.__name__}.png')
 
