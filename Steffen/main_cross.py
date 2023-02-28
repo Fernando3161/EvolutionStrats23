@@ -65,6 +65,7 @@ if __name__ == '__main__':
     s_sigma = np.zeros(n) # Initial evolution path
     rho = 2
     scaling_factor = 10 # scaling factor for the initial parents
+    crossover_function = 0  # ["none", "intermediate_recombination","multi_recombination"]
     print(f'With: μ={mu}, λ={lambd} and {n} dimension(s).')
 
     c_sigma = np.sqrt(1 / (n + 1))
@@ -93,22 +94,34 @@ if __name__ == '__main__':
                 while generation < max_generation:
                     generation += 1
 
-                    old_parent = best_parent
-                    children = create_children(best_parent, sigma, fitn, generation, n)
+                    "If no crossover is needed proceed with mutation of selected best parents."
+                    if crossover_function == 0:
+                        old_parent = best_parent
+                        children = create_children(best_parent, sigma, fitn, generation, n)
 
-                    parents = selec(mu, parents, children)
-                    best_parent = sorted(parents, key=lambda x: x.fit, reverse=False)[0]
-                    solution_list.append(best_parent.fit)
+                        parents = selec(mu, parents, children)
+                        best_parent = sorted(parents, key=lambda x: x.fit, reverse=False)[0]
+                        solution_list.append(best_parent.fit)
 
-                    "Evolution path initialisation"
-                    if muta == m.evol_path:
-                        if best_parent.fit < old_parent.fit:
-                            old_parent = best_parent
-                            s_sigma = (1 - c_sigma) * s_sigma + c_sigma * best_parent.z_k  # eq. 9
-                            sigma = best_parent.sigma * np.exp((c_sigma / d) * (np.linalg.norm(s_sigma) / n - 1))  # eq. 10
 
-                        s_sigma = (1 - c_sigma) * s_sigma + c_sigma * old_parent.z_k  # eq. 9
-                        sigma = old_parent.sigma
+                        "Evolution path initialisation"
+                        if muta == m.evol_path:
+                            if best_parent.fit < old_parent.fit:
+                                old_parent = best_parent
+                                s_sigma = (1 - c_sigma) * s_sigma + c_sigma * best_parent.z_k  # eq. 9
+                                sigma = best_parent.sigma * np.exp((c_sigma / d) * (np.linalg.norm(s_sigma) / n - 1))  # eq. 10
+
+                            s_sigma = (1 - c_sigma) * s_sigma + c_sigma * old_parent.z_k  # eq. 9
+                            sigma = old_parent.sigma
+
+                    else:
+                        "If crossover is wanted, use create_children_cross function"
+                        children = create_children_cross(lambd, parents, rho, sigma, fitn, generation, n)
+                        parents = selec(mu, parents, children)
+
+                        "Documentation of the best fitness of each generation for the plot"
+                        best_parent = sorted(parents, key=lambda x: x.fit)[0]
+                        solution_list.append(best_parent.fit)
 
                     "Sigma documentation for the plot"
                     try:
@@ -118,11 +131,11 @@ if __name__ == '__main__':
 
                     # ToDO: make this listing more variable
                     "Exit if no improvement of results"
-                    if len(solution_list) > 21:
-                        mean_before = np.mean(solution_list[-21:-2])
-                        mean_after = np.mean(solution_list[-20:-1])
-                        if mean_after == mean_before:
-                            max_generation = generation
+                    # if len(solution_list) > 21:
+                    #     mean_before = np.mean(solution_list[-21:-2])
+                    #     mean_after = np.mean(solution_list[-20:-1])
+                    #     if mean_after == mean_before:
+                    #         max_generation = generation
 
                 dt2 = datetime.datetime.now() # Get last timestemp for duration calculation
                 dt = dt2 - dt1 # Get timestep delta

@@ -98,7 +98,7 @@ def dr_self_adap(child, sigma, fitn, generation, n):
     e_k = tau * np.random.randn()  # eq. 5
     z_k = np.random.randn(n)  # eq. 6
     x_k = child.x + np.exp(e_k) * sigma * z_k  # eq. 7
-    sigma_k = sigma * np.exp(1/d_i) * (np.linalg.norm(z_k) / np.sqrt(n-1) - 1) * np.exp(e_k / d) # eq. 8 Lehrbuch # Problem 1
+    sigma_k = sigma * np.exp((1/d_i) * (np.linalg.norm(z_k) / np.sqrt(n-1) - 1)) * np.exp(e_k / d) # eq. 8 Lehrbuch # Problem 1
     child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma_k)
     return child
 
