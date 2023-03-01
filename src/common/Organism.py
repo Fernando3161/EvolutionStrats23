@@ -11,7 +11,7 @@ class Organism(object):
         self.func = func
         self.fitness = None
         self.generation = generation
-        if genes is not None:
+        if genes is not None and func is not None:
             self.calc_fitness()
 
     

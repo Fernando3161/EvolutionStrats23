@@ -4,101 +4,74 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
-
 from common.functions import create_genes
-from common.Organism import Organism
+from common.organism import Organism
 
-# Exercise 1.1
-# 1+1 ES
-# Exercises
-# 1. Implement a (1+1)-ES with Gaussian mutation, step size σ = 1.0,
-# and optimize the Sphere function with N = 2, 10, 100.
-# 2. Test different numbers of generations, e.g., 10, 100, and 1000.
 
-# Mutation
-def create_mutation(parent, sigma=None):
-    """Mutation adds the parent values to a random value of the sigma
-    Args:
-        parent_genes (Organism): An Organism acing as parent
-        sigma (double): Scale factor for mutation
-
-    Returns:
-        array: array with genes of the mutation
-    """
-    if sigma is None:
-        sigma = parent.sigma
-
-    random_list = np.random.randn(len(parent.genes))
-    mutation = sigma * random_list
-    child = Organism(genes = mutation, sigma = sigma, func=parent.func)
-    #child.calc_fitness()
-    return child
-
-"""
-def create_child(parent, sigma):
-    # Mutiert den parent und kreiert ein child
-    child = mutation(parent, sigma)
-    return child
-"""
-# Selection
-def selection(parent, child):
-    """Selects between a parent and one children
-
-    Args:
-        parent (Organism): A parent organism
-        child (Organism): A child organism
-
-    Returns:
-        Organism: organism with the best selection
-    """
-    # wählt zwischen parent und child das element mit der kleineren Fitness
-    if parent.fitness<child.fitness:
-        
-        return parent
-    else:
-        
-        return child
-
-def one_one_ES(N=5, SIGMA = 0.1, FUNC = 0, MAX_GENS = 1000, APPLY_LIMIT = False):
+def one_one_ES(n=5, sigma=0.1, func=0, generations=1000, 
+               APPLY_LIMIT=False, rechenberg = False):
     # Initialisation
-    parent_genes = create_genes(N)
-    parent = Organism(genes =parent_genes, sigma = SIGMA, func = FUNC, generation = 0 )
-    
-    solution_list = []
-    solution_list.append(parent.fitness)
+    parent_genes = create_genes(n)
+    parent = Organism(genes=parent_genes, sigma=sigma, func=func, generation=0)
+    parent.calc_fitness()
+    genes_ = [parent.genes]
+    fitness_ = [parent.fitness]
+    sigma_ = [parent.sigma]
 
     generation = 0
-    while generation < MAX_GENS:
+    while generation < generations:
         generation += 1
-        child = create_mutation(parent)
-        parent = selection(parent, child)
-        solution_list.append(parent.fitness)
-
+        child_genes = parent.genes + sigma*np.random.randn(n)
+        child = Organism(genes=child_genes, sigma=sigma,
+                         func=func, generation=generation)
+        child.calc_fitness()
+        if rechenberg:
+            d = np.sqrt(n+1)
+            faktor= 1 if child.fitness < parent.fitness else 0
+            sigma=sigma*np.exp(1/d*(faktor-1/5))
+        if child.fitness < parent.fitness:
+            parent = child
         # fancy exit algorithm (because I am bored)
-        limit = int(MAX_GENS/100)+1
-        if len(solution_list) > limit and APPLY_LIMIT:
-            mean_before = np.mean(solution_list[-limit:-2])
-            mean_after = np.mean(solution_list[-limit+1:-1])
+        limit = int(generations/100)+1
+        if len(fitness_) > limit and APPLY_LIMIT:
+            mean_before = np.mean(fitness_[-limit:-2])
+            mean_after = np.mean(fitness_[-limit+1:-1])
             if mean_after == mean_before:
-                generation = MAX_GENS
+                generation = generations
 
-    # Save the results
-    return solution_list
+        genes_.append(parent.genes)
+        fitness_.append(parent.fitness)
+        sigma_.append(parent.sigma)
 
-def main():
+    results = {"genes": genes_, "fitness": fitness_, "sigma": sigma_}
+    return results
+
+
+def main_one_one_ES():
     # Study of the functions using several configuration parameters
-    N = [2,5,10]
-    FUNC = [0,1,2]
-    results = {}
+    N = [2, 5, 10]
+    FUNC = [0, 1, 2]
+    RECH = [False, True]
 
-    for n, f in [(x,y) for x in N for y in FUNC]:
-        fitness = one_one_ES(N=n, SIGMA = 0.1, FUNC = f, MAX_GENS = 1000, APPLY_LIMIT = False)
-        results[str((n,f))]=fitness
-
-    df = pd.DataFrame.from_dict(results)
-    df.to_csv(os.path.join(os.getcwd(),"src","results", f"one_one.csv"))
-
+    for n, f,r in [(x, y, z) for x in N for y in FUNC for z in RECH]:
+        results = one_one_ES(n=n, sigma=0.05, func=f,
+                             generations=10000, APPLY_LIMIT=False,
+                             rechenberg=r)
+        df = pd.DataFrame.from_dict(results)
+        path = os.path.join(os.getcwd(), "results", "one_one_es")
+        isExist = os.path.exists(path)
+        if not isExist:
+            os.makedirs(path)
+        # Create a new directory because it does not exist
+        if r:
+            filename = f"one_one_es_F_{f}_n_{n}_rech.csv"
+        else:
+            filename = f"one_one_es_F_{f}_n_{n}.csv"
+        df.to_csv(os.path.join(os.getcwd(), "results",
+                  "one_one_es", filename),
+                  header=True,)
+        print(f"Done for Function {f} for N = {n}, Rechenberg = {r}")
 
 
 if __name__ == '__main__':
-    main()
+    main_one_one_ES()

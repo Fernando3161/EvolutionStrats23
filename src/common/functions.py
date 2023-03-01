@@ -1,6 +1,6 @@
 import numpy as np
 
-def create_genes(dimensions=2, space=10):
+def create_genes(dimensions=2, space=10, positives = False):
     """Creates a list with N random elements normally distributed
 
     Args:
@@ -12,6 +12,8 @@ def create_genes(dimensions=2, space=10):
     """
 
     genes = space*np.random.rand(dimensions)
+    if positives:
+        genes = np.absolute(genes)
     return genes
 
 
@@ -29,9 +31,9 @@ def calc_fitness(genes, func=None):
         double: fitness value of the function
     """
 
-    func_list =  ["sphere","rosenbrock", "rastring"]
+    func_list =  ["sphere","rosenbrock", "rastrigin"]
     func = func_list[func]
-    if func not in ["sphere", "rosenbrock", "rastring"]:
+    if func not in ["sphere", "rosenbrock", "rastrigin"]:
         raise ValueError("Fitness function not recognized")
     # Fitnessfunktion ist die Multiplikation aller N Elemente
     if func == "sphere":
@@ -46,7 +48,7 @@ def calc_fitness(genes, func=None):
             fitness += 100 * (x * x - y) ** 2 + (x - 1) ** 2
         return fitness
 
-    if func == "rastring":
+    if func == "rastrigin":
         a = 10
         n = len(genes)
         fitness = a * n
