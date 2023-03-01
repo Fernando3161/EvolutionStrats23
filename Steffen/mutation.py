@@ -106,3 +106,10 @@ def evol_path(child, sigma, fitn, generation, n):
     x_k = child.x + sigma * z_k  # eq. 6.1
     child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma, z_k=z_k)
     return child
+
+def cma(child, sigma, fitn, generation, n,c):
+    #ToDo: C muss übergeben werden
+    z_k = np.random.randn(n)
+    x_k = child.x + sigma * np.sqrt(c) * z_k
+    child = Organism(fit=fitn(x_k), x=x_k, born=generation, z_k=z_k)
+    return child
