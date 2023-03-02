@@ -5,12 +5,13 @@ class Organism(object):
     """General data class to store information
     """
 
-    def __init__(self, genes=None, sigma=None,func=None, generation = None) -> None:
+    def __init__(self, genes=None, sigma=None,z=None,func=None, generation = None) -> None:
         self.genes = genes
         self.sigma = sigma
         self.func = func
         self.fitness = None
         self.generation = generation
+        self.z = z
         if genes is not None and func is not None:
             self.calc_fitness()
 
