@@ -74,9 +74,9 @@ def main_one_one_covar():
 
     for n, f in [(x, y) for x in N for y in FUNC]:
         results = one_one_covar(n=n, lam = 20, sigma=0.5, func=f,
-                             generations=int(2*10**(np.sqrt(n)+1)),
+                             generations=int(2000),
                              alpha= 20,
-                             kappa= 30)
+                             kappa= 20)
 
         df = pd.DataFrame.from_dict(results)
         path = os.path.join(os.getcwd(), "results", "one_one_covar")
