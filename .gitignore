@@ -4,8 +4,8 @@ __pycache__/
 *$py.class
 *.csv
 # C extensions
-*.so
-
+*.so*
+.dat
 # Distribution / packaging
 .Python
 build/
