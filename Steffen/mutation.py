@@ -22,6 +22,11 @@ def gaus_muta(child, sigma, fitn, generation, n):
     child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma)
     return child
 
+def rechenberg(best_parent,old_parent,sigma,d):
+    faktor = 1 if best_parent.fit < old_parent.fit else 0
+    sigma = sigma * np.exp(1 / d * (faktor - 1 / 5))
+    return sigma
+
 # ToDo: N optional parameter
 def self_adap(child, sigma, fitn, generation, n):
     """

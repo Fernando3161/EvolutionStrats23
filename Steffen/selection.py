@@ -1,5 +1,4 @@
 from Organism import Organism
-import mutation as m
 
 
 def plus(mu, parents, children):

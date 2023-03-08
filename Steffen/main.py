@@ -68,31 +68,35 @@ def cma_plus(parents):
 
 
 if __name__ == '__main__':
-    n = 10  # Genomes / dimensions
-    mu = 20  # Parents
-    lambd = 100  # Offsprings
-    s_sigma = np.zeros(n) # Initial evolution path
-    rho = 2
+    n = 5  # Genomes / dimensions
+    mu = 20  # μ: Parents
+    lambd = 100  # λ: Offsprings
+
+    rho = 2 # ρ: Parent population
     scaling_factor = 10 # scaling factor for the initial parents
     print(f'With: μ={mu}, λ={lambd} and {n} dimension(s).')
 
+    "Rechenberg Rule"
+    rechenberg = 1 # Switch on and off for the rule
+    d = np.sqrt(n+1)
 
+    "Initial parameters for evolution path"
+    s_sigma = np.zeros(n) # Initial evolution path
 
+    "Initial parameters for CMA"
+    c = 1 # CMA Matrix
 
-    c = 1
-
-    plot_generation = 0 # Do we want plots?
+    plot_generation = 1 # Do we want plots?
 
     "Iteration over fitness functions"
-    for fitn in [f.sphere]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
+    for fitn in [f.sphere,f.doublesum]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
         print(f'\n')
         print(f'-------------------- Results for {fitn.__name__} fitness function. --------------------')
 
         "Iteration over mutation functions"
-        for muta in [m.cma]:  # [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path]
+        for muta in [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path]:  # [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path]
 
             "Initial value assignments"
-            #for selec in [s.comma_1]: #[s.plus, s.comma, s.comma_1]:
             generation = 0 # Set generation counter back to zero
             max_generation = 1000 # Set maximum generation
             sigma = 1 / n # Mutation rates (also called stepsize)
@@ -103,31 +107,38 @@ if __name__ == '__main__':
             c = 1
             #c = np.random.multivariate_normal([1,1],[[1,1],[1,1]]) # What the fuck is this?
 
-
             "Creation of first parent generation"
             parents = create_parents(mu, n, sigma, scaling_factor)
             best_parent = sorted(parents, key=lambda x: x.fit)[0]
+            old_parent = best_parent
 
             dt1 = datetime.datetime.now() # Get first timestemp for duration calculation
             while generation < max_generation:
                 generation += 1
 
-                old_parent = best_parent
+                #old_parent = best_parent
                 children = create_children(old_parent, sigma, fitn, generation, n)
 
                 "Choose selection for each mutation"
                 if muta == m.gaus_muta:
                     new_parents = s.plus(mu, parents, children)
                 elif muta == m.self_adap:
-                    new_parents = s.comma_1(mu, parents, children)
+                    new_parents = s.comma(mu, parents, children)
                 elif muta == m.dr_self_adap:
-                    new_parents = s.comma_1(mu, parents, children)
+                    new_parents = s.comma(mu, parents, children)
                 elif muta == m.evol_path:
-                    new_parents = s.comma_1(mu, parents, children)
+                    new_parents = s.comma(mu, parents, children)
                 elif muta == m.cma:
                     new_parents = m.plus(mu, parents, children)
 
                 best_parent = sorted(new_parents, key=lambda x: x.fit, reverse=False)[0]
+
+
+                if muta == m.gaus_muta:
+                    "Rechenberg success counter function and sigma adaption"
+                    if rechenberg == 1:
+                        sigma = m.rechenberg(best_parent,old_parent,sigma,d)
+
                 if best_parent.fit < old_parent.fit:
                     old_parent = best_parent
 
@@ -161,8 +172,6 @@ if __name__ == '__main__':
                     c = (1 - c_mu) * c + c_mu * (1/mu) * sum(new_parents.z_k)
 
 
-
-
                 "Sigma documentation for the plot"
                 try:
                     sigma_list.append(sum(old_parent.sigma))
@@ -180,13 +189,13 @@ if __name__ == '__main__':
             dt = dt2 - dt1 # Get timestep delta
             "Exit print after finishing"
             if muta == m.gaus_muta:
-                print(f'(µ+λ) Gaussian mutation: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
+                print(f'({mu}+{lambd}) Gaussian mutation: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
             elif muta == m.self_adap:
-                print(f'(1,1) Self-Adaptation (SA): {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
+                print(f'({mu},{lambd}) Self-Adaptation (SA): {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
             elif muta == m.dr_self_adap:
-                print(f'(1,1) De-randomized SA: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
+                print(f'({mu},{lambd}) De-randomized SA: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
             elif muta == m.evol_path:
-                print(f'(1,1) Evolution path: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
+                print(f'({mu},{lambd}) Evolution path: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
             elif muta == m.cma:
                 print(f'(µ+λ)Covariance matrix adaption: {old_parent.fit} from generation: {old_parent.born} Duration: {dt.seconds} seconds')
 
@@ -208,7 +217,7 @@ if __name__ == '__main__':
                 # plt.show()
 
                 "Plot saving"
-                if best_parent.fit < 0.000001:
-                    plt.savefig(f'Plots/{fitn.__name__}_{selec.__name__}_{muta.__name__}_convert.png')
+                if best_parent.fit < 0.000000000000001:
+                    plt.savefig(f'Plots\{fitn.__name__}_{muta.__name__}_convert.png')
                 else:
-                    plt.savefig(f'Plots/{fitn.__name__}_{muta.__name__}_{selec.__name__}.png')
+                    plt.savefig(f'Plots\{fitn.__name__}_{muta.__name__}.png')
