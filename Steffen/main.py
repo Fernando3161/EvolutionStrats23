@@ -138,16 +138,17 @@ if __name__ == '__main__':
 
                 best_parent = sorted(new_parents, key=lambda x: x.fit, reverse=False)[0]
 
-
+                "Rechenberg success counter function and sigma adaption for gaus and CMA"
                 if muta == m.gaus_muta:
-                    "Rechenberg success counter function and sigma adaption"
                     if rechenberg == 1:
                         sigma = m.rechenberg(best_parent,old_parent,sigma,d)
                 elif muta == m.cma:
                     sigma = m.rechenberg(best_parent, old_parent, sigma, d)
 
+                "Comparision between best old parents and new parents"
                 if best_parent.fit < old_parent.fit:
                     old_parent = best_parent
+                    "CMA: A adaption"
                     if muta == m.cma:
                         if len(A) >= alpha:
                             A = A[1:alpha]
@@ -170,12 +171,10 @@ if __name__ == '__main__':
                     sigma = old_parent.sigma
                     "Value assignments after selection"
                     s_sigma = (1 - c_sigma) * s_sigma + c_sigma * z  # eq. 9
-                    "Similar equation formulations"
+                    "Similar equation formulations - last one works best"
                     #sigma = old_parent.sigma * np.exp((c_sigma / d) * (np.linalg.norm(s_sigma) / np.sqrt(n) - 1))  # eq. 10
                     #sigma = old_parent.sigma * np.exp((c_sigma / (2 * d)) * (np.linalg.norm(s_sigma ** 2) / n - 1))  # eq. 10
                     sigma = old_parent.sigma * np.exp(1 / 2 / d / n * ((np.linalg.norm(s_sigma)) ** 2 - n))  # eq. 10
-                elif muta == m.cma:
-                    "Initial values for CMA"
 
 
                 "Sigma documentation for the plot"
