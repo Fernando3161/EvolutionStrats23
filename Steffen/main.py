@@ -68,7 +68,7 @@ def cma_plus(parents):
 
 
 if __name__ == '__main__':
-    n = 5  # Genomes / dimensions
+    n = 2  # Genomes / dimensions
     mu = 1  # μ: Parents
     lambd = 1  # λ: Offsprings
 
@@ -84,17 +84,15 @@ if __name__ == '__main__':
     s_sigma = np.zeros(n) # Initial evolution path
 
     "Initial parameters for CMA"
-    A = []
+    A = [] # archive A of the α best solutions
     C = np.identity(n)  # correlation matrix which specifies correlations between dimensions
-    #C = np.cov(np.array(A).T)
-    # c = np.random.multivariate_normal([1,1],[[1,1],[1,1]]) # What the fuck is this?
     kappa = 5
-    alpha = 10
+    alpha = 10 # α best solutions
 
     plot_generation = 1 # Do we want plots?
 
     "Iteration over fitness functions"
-    for fitn in [f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
+    for fitn in [f.rastrigen]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
         print(f'\n')
         print(f'-------------------- Results for {fitn.__name__} fitness function. --------------------')
 
@@ -104,7 +102,7 @@ if __name__ == '__main__':
             "Initial value assignments"
             generation = 0 # Set generation counter back to zero
             iteration = 0
-            max_generation = 1000 # Set maximum generation
+            max_generation = 2000 # Set maximum generation
             sigma = 1 / n # Mutation rates (also called stepsize)
             solution_list = [] # Set list of best solutions back to empty
             sigma_list = [] # Set list of best solutions sigmas back to empty
@@ -119,7 +117,7 @@ if __name__ == '__main__':
                 generation += 1
 
                 "CMA: adapt C Matrix every kappa generations"
-                if generation % kappa == 0 and len(A) >= alpha:
+                if generation%kappa == 0 and len(A) >= alpha:
                     C = np.cov(np.transpose(A))
 
                 children = create_children(old_parent, sigma, fitn, generation, n)

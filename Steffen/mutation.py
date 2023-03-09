@@ -114,13 +114,10 @@ def evol_path(child, sigma, fitn, generation, n, C):
 
 
 def cma(child, sigma, fitn, generation, n, C):
-    d = np.sqrt(n+1)
     c_matrix = np.random.multivariate_normal(mean=[0 for _ in range(n)], cov=C)
     x_k = child.x + sigma * c_matrix
-    faktor = 1 if fitn(x_k) < child.fit else 0
-    sigma = sigma * np.exp(1 / d * (faktor - 1 / 5))
     child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma)
-
-    #sigma_vector = sigma * np.random.multivariate_normal(mean=[0 for _ in range(n)], cov=covar)
+    # Vector = np.random.multivariate_normal(mean=[0 for _ in range(n)], cov=covar)
+    #sigma_vector = sigma * Vector
     #child_genes = parent.genes + sigma_vector
     return child
