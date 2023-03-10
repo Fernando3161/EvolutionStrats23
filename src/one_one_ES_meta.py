@@ -82,7 +82,7 @@ def meta_one_one_es(
 
 
 def main_meta():
-    for f,n in [(f,g) for f in [0,1,2,] for g in [2, 5, 10]]:
+    for f,n in [(f,g) for f in [0,1,2] for g in [2, 5, 10]]:
         df = meta_one_one_es(
             meta_iters=200,
             internal_iter=2000,
