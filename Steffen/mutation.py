@@ -2,7 +2,7 @@ import numpy as np
 from Organism import Organism
 
 
-def gaus_muta(child, sigma, fitn, generation, n):
+def gaus_muta(child, sigma, fitn, generation, n,C):
     """
     Uses the self-adaptation for the mutation of genomes.
 
@@ -22,8 +22,13 @@ def gaus_muta(child, sigma, fitn, generation, n):
     child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma)
     return child
 
+def rechenberg(best_parent,old_parent,sigma,d):
+    faktor = 1 if best_parent.fit < old_parent.fit else 0
+    sigma = sigma * np.exp(1 / d * (faktor - 1 / 5))
+    return sigma
+
 # ToDo: N optional parameter
-def self_adap(child, sigma, fitn, generation, n):
+def self_adap(child, sigma, fitn, generation, n, C):
     """
     Uses the self-adaptation for the mutation of genomes.
 
@@ -49,7 +54,7 @@ def self_adap(child, sigma, fitn, generation, n):
 
 
 # ToDo: Check mutlivariate Self-Adaptation
-def multi_reco(child, sigma, fitn, generation, n):
+def multi_reco(child, sigma, fitn, generation, n, C):
     """
     Uses the multi-recombination for the mutation of genomes.
 
@@ -74,7 +79,7 @@ def multi_reco(child, sigma, fitn, generation, n):
     return child
 
 
-def dr_self_adap(child, sigma, fitn, generation, n):
+def dr_self_adap(child, sigma, fitn, generation, n, C):
     """
     Uses the derandomized self-adaptation for the mutation of genomes.
 
@@ -101,15 +106,18 @@ def dr_self_adap(child, sigma, fitn, generation, n):
     return child
 
 
-def evol_path(child, sigma, fitn, generation, n):
+def evol_path(child, sigma, fitn, generation, n, C):
     z_k = np.random.randn(n)
     x_k = child.x + sigma * z_k  # eq. 6.1
     child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma, z_k=z_k)
     return child
 
-def cma(child, sigma, fitn, generation, n,c):
-    #ToDo: C muss übergeben werden
-    z_k = np.random.randn(n)
-    x_k = child.x + sigma * np.sqrt(c) * z_k
-    child = Organism(fit=fitn(x_k), x=x_k, born=generation, z_k=z_k)
+
+def cma(child, sigma, fitn, generation, n, C):
+    c_matrix = np.random.multivariate_normal(mean=[0 for _ in range(n)], cov=C)
+    x_k = child.x + sigma * c_matrix
+    child = Organism(fit=fitn(x_k), x=x_k, born=generation, sigma=sigma)
+    # Vector = np.random.multivariate_normal(mean=[0 for _ in range(n)], cov=covar)
+    #sigma_vector = sigma * Vector
+    #child_genes = parent.genes + sigma_vector
     return child
