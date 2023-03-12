@@ -225,7 +225,7 @@ if __name__ == '__main__':
     for fitn in func:
         start = 0
         best_solution = create_parents(mu, n)[0]
-        for muta in [m.cma]:  # [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path, m.cma]
+        for muta in [m.gaus_muta]:  # [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path, m.cma]
             while start <= restarts:
                 start += 1
 
@@ -235,18 +235,13 @@ if __name__ == '__main__':
                     best_solution = new_solution
 
                 solution_list.append(best_solution.fit)
-    x = []
-    for i in range(restarts+1):
-        x.append(i)
-    fig, ax1 = plt.subplots()
-    ax1.plot(x, solution_list, 'blue')
-    ax1.set_xlabel('Iterations')
-    ax1.set_ylabel('Fitness', color='blue')
-    #ax1.set_yscale("log")
+        x = []
+        for i in range(restarts+1):
+            x.append(i)
+        fig, ax1 = plt.subplots()
+        ax1.plot(x, solution_list, 'blue')
+        ax1.set_xlabel('Restarts')
+        ax1.set_ylabel('Fitness', color='blue')
+        ax1.set_yscale("log")
 
-    plt.show()
-
-
-
-
-
+        plt.show()

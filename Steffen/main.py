@@ -21,7 +21,7 @@ def create_parents(mu, N, sigma, scaling_factor):
     return parents
 
 
-def create_children(best_parent, sigma, fitn, generation, n):
+def create_children(best_parent, sigma, fitn, generation, n, C, muta):
     children: [Organism] = []
 
     for i in range(lambd):
@@ -64,7 +64,7 @@ def cma_plus(parents):
     c_mu = 1 / np.sqrt(n ** 2 + 1)
     d = 1 + np.sqrt(1 / n)
     s_sigma = (1 - c_sigma)
-    parentsX = parents.x + sigma * c ** (1/2)
+    parentsX = parents.x + sigma * C ** (1/2)
 
 
 if __name__ == '__main__':
@@ -86,23 +86,23 @@ if __name__ == '__main__':
     "Initial parameters for CMA"
     A = [] # archive A of the α best solutions
     C = np.identity(n)  # correlation matrix which specifies correlations between dimensions
-    kappa = 5
-    alpha = 10 # α best solutions
+    kappa = 20 #
+    alpha = 40  # α best solutions
 
     plot_generation = 1 # Do we want plots?
 
     "Iteration over fitness functions"
-    for fitn in [f.rastrigen]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
+    for fitn in [f.sphere, f.rastrigen, f.rosenbruck]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
         print(f'\n')
         print(f'-------------------- Results for {fitn.__name__} fitness function. --------------------')
 
         "Iteration over mutation functions"
-        for muta in [m.cma]:  # [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path, m.cma]
+        for muta in [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path, m.cma]:  # [m.gaus_muta, m.self_adap, m.dr_self_adap, m.evol_path, m.cma]
 
             "Initial value assignments"
             generation = 0 # Set generation counter back to zero
             iteration = 0
-            max_generation = 2000 # Set maximum generation
+            max_generation = 100000 # Set maximum generation
             sigma = 1 / n # Mutation rates (also called stepsize)
             solution_list = [] # Set list of best solutions back to empty
             sigma_list = [] # Set list of best solutions sigmas back to empty
@@ -120,7 +120,7 @@ if __name__ == '__main__':
                 if generation%kappa == 0 and len(A) >= alpha:
                     C = np.cov(np.transpose(A))
 
-                children = create_children(old_parent, sigma, fitn, generation, n)
+                children = create_children(old_parent, sigma, fitn, generation, n, C, muta)
 
                 "Choose selection for each mutation"
                 if muta == m.gaus_muta:
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                     if rechenberg == 1:
                         sigma = m.rechenberg(best_parent,old_parent,sigma,d)
                 elif muta == m.cma:
-                    sigma = m.rechenberg(best_parent, old_parent, sigma, d)
+                    sigma = m.rechenberg(best_parent,old_parent,sigma,d)
 
                 "Comparision between best old parents and new parents"
                 if best_parent.fit < old_parent.fit:
@@ -170,9 +170,9 @@ if __name__ == '__main__':
                     "Value assignments after selection"
                     s_sigma = (1 - c_sigma) * s_sigma + c_sigma * z  # eq. 9
                     "Similar equation formulations - last one works best"
-                    #sigma = old_parent.sigma * np.exp((c_sigma / d) * (np.linalg.norm(s_sigma) / np.sqrt(n) - 1))  # eq. 10
-                    #sigma = old_parent.sigma * np.exp((c_sigma / (2 * d)) * (np.linalg.norm(s_sigma ** 2) / n - 1))  # eq. 10
-                    sigma = old_parent.sigma * np.exp(1 / 2 / d / n * ((np.linalg.norm(s_sigma)) ** 2 - n))  # eq. 10
+                    sigma = old_parent.sigma * np.exp((c_sigma / d) * (np.linalg.norm(s_sigma) / np.sqrt(n) - 1))  # eq. 10
+                    # sigma = old_parent.sigma * np.exp((c_sigma / (2 * d)) * (np.linalg.norm(s_sigma ** 2) / n - 1))  # eq. 10
+                    # sigma = old_parent.sigma * np.exp(1 / 2 / d / n * ((np.linalg.norm(s_sigma)) ** 2 - n))  # eq. 10
 
 
                 "Sigma documentation for the plot"
@@ -182,11 +182,11 @@ if __name__ == '__main__':
                     sigma_list.append(old_parent.sigma)
 
                 "Exit if no improvement of results"
-                if len(solution_list) > 100: # 21
-                    mean_before = np.mean(solution_list[-100:-2]) # [-21:-2])
-                    mean_after = np.mean(solution_list[-99:-1]) # [-20:-1])
-                    if mean_after == mean_before:
-                        max_generation = generation
+                #if len(solution_list) > 100: # 21
+                #    mean_before = np.mean(solution_list[-100:-2]) # [-21:-2])
+                #    mean_after = np.mean(solution_list[-99:-1]) # [-20:-1])
+                #    if mean_after == mean_before:
+                #        max_generation = generation
 
             dt2 = datetime.datetime.now() # Get last timestemp for duration calculation
             dt = dt2 - dt1 # Get timestep delta
