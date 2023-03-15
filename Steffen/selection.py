@@ -15,6 +15,8 @@ def plus(mu, parents, children):
     -------
     new_parents (list): List of individual organisms (class) representing the new parent population.
     """
+    if not isinstance(parents, list):
+        parents= [parents]
     population: [Organism] = parents + children
     population = sorted(population, key=lambda x: x.fit)
     new_parents = list(population)[:mu]
