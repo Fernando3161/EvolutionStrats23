@@ -39,3 +39,8 @@
 # s_σ = Evolution path / cumulative path length = record of employed stepsize
 
 # big font is an indicator for a vector/matrix?
+
+# Abbreviation
+    # EMOA = Evolutionary multi-objectiv algorithm
+    # NSGA-2 = Non-dominated Sorting Genetic Algorithm II
+    # SMS-EMOA = SMetrik-Selektion-EMOA
