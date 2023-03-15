@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     "Iteration over fitness functions"
     # [f.sphere, f.rastrigen, f.rosenbruck]: #[f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
-    for fitn in [f.rosenbruck]:
+    for fitn in [f.sphere, f.rastrigen, f.rosenbruck, f.doublesum]:
         print(f'\n')
         print(
             f'-------------------- Results for {fitn.__name__} fitness function. --------------------')
